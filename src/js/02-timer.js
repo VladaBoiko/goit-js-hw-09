@@ -1,4 +1,11 @@
-refs = {
+// Поясни, як ініціалізувати таймер без перезавантаження, бо я здурію)))
+// Поняття не маю, для чого зробила кнопку стопу, мабуть просто щоб було видно, що старт неактивний
+// Стоп актуальний хіба, якби можна було новий час поставити зразу(((((
+
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+
+const refs = {
   startBtn: document.querySelector('[data-start]'),
   stopBtn: document.querySelector('[data-stop]'),
   clockFace: document.querySelector('.timer'),
@@ -7,41 +14,98 @@ refs = {
   minutesValue: document.querySelector('[data-minutes]'),
   secundesValue: document.querySelector('[data-seconds]'),
 };
+refs.startBtn.setAttribute('disabled', 'disabled');
+const options = {
+  enableTime: true,
+  time_24hr: true,
+  defaultDate: new Date(),
+  minuteIncrement: 1,
+  onClose(selectedDates) {
+    const finishDate = new Date(selectedDates[0]);
+    const utsFinishDate = finishDate.getTime();
+    const currentTime = Date.now();
+    const past = utsFinishDate < currentTime;
+    const future = utsFinishDate > currentTime;
+    if (future) {
+      refs.startBtn.removeAttribute('disabled', 'disabled');
+    }
+    if (past) {
+      window.alert('Please choose a date in the future');
+    }
+    refs.startBtn.addEventListener('click', () => {
+      timer.start(utsFinishDate, currentTime);
+    });
 
-const timer = {
-  start() {
-    const startTime = Date.now();
-    console.log(startTime);
-
-    setInterval(() => {
-      const currentTime = Date.now();
-      const deltaTime = currentTime - startTime;
-      const { days, hours, mins, secs } = getTimeComponents(deltaTime);
-      console.log(`${days} :: ${hours} :: ${mins} :: ${secs}`);
-
-      // console.log(new Date(deltaTime).getUTCHours());
-    }, 1000);
+    refs.stopBtn.addEventListener('click', () => {
+      timer.stop();
+    });
   },
 };
-timer.start();
+flatpickr('#datetime-picker', options);
+
+class Timer {
+  constructor({ onTick }) {
+    this.intervalId = null;
+    this.isActive = false;
+    this.onTick = onTick;
+    this.init();
+  }
+  init() {
+    const time = this.convertMs(0);
+    this.onTick(time);
+  }
+
+  start(finishTime, currentTime) {
+    if (this.isActive) {
+      return;
+    }
+    this.isActive = true;
+    this.intervalId = setInterval(() => {
+      const currentTime = Date.now();
+      const deltaTime = finishTime - currentTime;
+      const time = this.convertMs(deltaTime);
+
+      this.onTick(time);
+      this.timeStop(deltaTime);
+    }, 1000);
+  }
+  timeStop(deltaTime) {
+    if (deltaTime < 1000) {
+      timer.stop();
+      window.alert('YOU DIED!!!!!');
+    }
+  }
+  stop() {
+    clearInterval(this.intervalId);
+    this.isActive = false;
+    const time = this.convertMs(0);
+    this.onTick(time);
+  }
+
+  convertMs(ms) {
+    const second = 1000;
+    const minute = second * 60;
+    const hour = minute * 60;
+    const day = hour * 24;
+
+    const days = pad(Math.floor(ms / day));
+    const hours = pad(Math.floor((ms % day) / hour));
+    const minutes = pad(Math.floor(((ms % day) % hour) / minute));
+    const seconds = pad(Math.floor((((ms % day) % hour) % minute) / second));
+
+    return { days, hours, minutes, seconds };
+  }
+}
 function pad(value) {
   return String(value).padStart(2, '0');
 }
-function getTimeComponents(time) {
-  const days = pad(
-    Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60 * 24))
-  );
-  const hours = pad(
-    Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-  );
-  const mins = pad(Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60)));
-  const secs = pad(Math.floor((time % (1000 * 60 * 60 * 24)) / 1000));
-  return { days, hours, mins, secs };
-}
-function updateTimerFace({ days, hours, mins, secs }) {
+
+const timer = new Timer({
+  onTick: updateTimerFace,
+});
+function updateTimerFace({ days, hours, minutes, seconds }) {
   refs.dayValue.textContent = `${days}`;
   refs.hoursValue.textContent = `${hours}`;
-  refs.minutesValue.textContent = `${mins}`;
-  refs.secundesValue.textContent = `${secs}`;
+  refs.minutesValue.textContent = `${minutes}`;
+  refs.secundesValue.textContent = `${seconds}`;
 }
-updateTimerFace();
