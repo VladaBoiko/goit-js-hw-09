@@ -1,7 +1,7 @@
 // Поясни, як ініціалізувати таймер без перезавантаження, бо я здурію)))
 // Поняття не маю, для чого зробила кнопку стопу, мабуть просто щоб було видно, що старт неактивний
 // Стоп актуальний хіба, якби можна було новий час поставити зразу(((((
-
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -30,7 +30,7 @@ const options = {
       refs.startBtn.removeAttribute('disabled', 'disabled');
     }
     if (past) {
-      window.alert('Please choose a date in the future');
+      Notify.failure('Please choose a date in the future');
     }
     refs.startBtn.addEventListener('click', () => {
       timer.start(utsFinishDate, currentTime);
@@ -72,7 +72,7 @@ class Timer {
   timeStop(deltaTime) {
     if (deltaTime < 1000) {
       timer.stop();
-      window.alert('YOU DIED!!!!!');
+      Notify.failure('YOU DIED!!!!!');
     }
   }
   stop() {
