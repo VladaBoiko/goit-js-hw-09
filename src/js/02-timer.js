@@ -15,6 +15,7 @@ const refs = {
   secundesValue: document.querySelector('[data-seconds]'),
 };
 refs.startBtn.setAttribute('disabled', 'disabled');
+
 const options = {
   enableTime: true,
   time_24hr: true,
@@ -22,27 +23,31 @@ const options = {
   minuteIncrement: 1,
   onClose(selectedDates) {
     const finishDate = new Date(selectedDates[0]);
-    const utsFinishDate = finishDate.getTime();
-    const currentTime = Date.now();
-    const past = utsFinishDate < currentTime;
-    const future = utsFinishDate > currentTime;
-    if (future) {
-      refs.startBtn.removeAttribute('disabled', 'disabled');
-    }
-    if (past) {
-      Notify.failure('Please choose a date in the future');
-    }
-    refs.startBtn.addEventListener('click', () => {
-      timer.start(utsFinishDate, currentTime);
-    });
-
-    refs.stopBtn.addEventListener('click', () => {
-      timer.stop();
-    });
+    timerOn(finishDate);
   },
 };
+
 flatpickr('#datetime-picker', options);
 
+function timerOn(finishDate) {
+  const utsFinishDate = finishDate.getTime();
+  const currentTime = Date.now();
+  const past = utsFinishDate < currentTime;
+  const future = utsFinishDate > currentTime;
+  if (future) {
+    refs.startBtn.removeAttribute('disabled', 'disabled');
+  }
+  if (past) {
+    Notify.failure('Please choose a date in the future');
+  }
+  refs.startBtn.addEventListener('click', () => {
+    timer.start(utsFinishDate, currentTime);
+  });
+
+  refs.stopBtn.addEventListener('click', () => {
+    timer.stop();
+  });
+}
 class Timer {
   constructor({ onTick }) {
     this.intervalId = null;
