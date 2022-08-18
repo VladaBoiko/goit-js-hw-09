@@ -16,6 +16,7 @@ refs.startBtn.addEventListener('click', () => {
     refs.body.style.backgroundColor = `${color}`;
   }, 1000);
 });
+
 refs.stopBtn.addEventListener('click', () => {
   refs.startBtn.disabled = false;
   clearInterval(colorId);
