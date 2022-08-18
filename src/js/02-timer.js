@@ -1,6 +1,4 @@
-// Поясни, як ініціалізувати таймер без перезавантаження, бо я здурію)))
-// Поняття не маю, для чого зробила кнопку стопу, мабуть просто щоб було видно, що старт неактивний
-// Стоп актуальний хіба, якби можна було новий час поставити зразу(((((
+// Я внесла вказані тобою зміни, але він до мене матюкається в консолі і починає чесати в мінус(
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -34,6 +32,9 @@ function timerOn(finishDate) {
   const currentTime = Date.now();
   const past = utsFinishDate < currentTime;
   const future = utsFinishDate > currentTime;
+  // let timer = new Timer({
+  //   onTick: updateTimerFace,
+  // });
   if (future) {
     refs.startBtn.removeAttribute('disabled', 'disabled');
   }
@@ -46,6 +47,7 @@ function timerOn(finishDate) {
 
   refs.stopBtn.addEventListener('click', () => {
     timer.stop();
+    // timer = null;
   });
 }
 class Timer {

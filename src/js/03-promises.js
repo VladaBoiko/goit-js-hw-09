@@ -14,10 +14,10 @@ form.addEventListener('submit', event => {
 
   for (let i = 1; i <= currentAmount; i += 1) {
     createPromise(i, currentDelay)
-      .then((position, delay) => {
+      .then(({ position, delay }) => {
         Notify.success(`Fulfilled promise ${position} in ${delay} ms`);
       })
-      .catch((position, delay) => {
+      .catch(({ position, delay }) => {
         Notify.failure(`Rejected promise ${position} in ${delay} ms`);
       });
     currentDelay += currentStep;
@@ -29,9 +29,9 @@ const createPromise = (position, delay) => {
     const shouldResolve = Math.random() > 0.3;
     setTimeout(() => {
       if (shouldResolve) {
-        resolve(position, delay);
+        resolve({ position, delay });
       }
-      reject(position, delay);
+      reject({ position, delay });
     }, delay);
   });
 };
