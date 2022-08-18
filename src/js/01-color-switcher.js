@@ -18,6 +18,7 @@ refs.startBtn.addEventListener('click', () => {
 });
 
 refs.stopBtn.addEventListener('click', () => {
+  console.log('hfjbvgzdf');
   refs.startBtn.disabled = false;
   clearInterval(colorId);
   refs.stopBtn.disabled = true;
